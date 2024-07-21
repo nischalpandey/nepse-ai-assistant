@@ -1,8 +1,0 @@
-Using pytho other AI packages that can solved any problem in context.
-Make a virtual assistance and customer support bot with following features:
-1. Greetings
-2. Knowledge of stock Nepal Stock (NEPSE)
-3. Letest price and history price of Nepse and their stocks
-4. Can solve user quires
-5. When user ask their information it show give their information: eg user: what is my email? 
-6. AI Prediction , Data Analysis
