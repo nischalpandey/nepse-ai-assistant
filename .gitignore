@@ -1,0 +1,6 @@
+.venv
+nepse.json
+dev_chat.py
+dev_chat.ipynb
+*.ipynb
+

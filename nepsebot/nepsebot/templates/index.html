@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEPSE Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center p-4 font-['Poppins']">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl">
+        <h1 class="text-4xl font-bold text-center mb-8 text-indigo-600">NEPSE Assistant</h1>
+        <form id="query-form" class="mb-6">
+            <div class="flex">
+                <input type="text" id="query" placeholder="Ask a question about NEPSE..." required
+                    class="flex-grow px-4 py-3 rounded-l-lg border-2 border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300">
+                <button type="submit"
+                    class="bg-indigo-500 text-white px-8 py-3 rounded-r-lg hover:bg-indigo-600 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+                    Ask
+                </button>
+            </div>
+        </form>
+        <div id="sample-questions" class="mb-6 bg-indigo-50 p-4 rounded-lg">
+            <p class="text-sm text-indigo-600 mb-2 font-semibold">Sample questions:</p>
+            <ul id="sample-list" class="space-y-2">
+                <!-- Sample questions will be inserted here -->
+            </ul>
+        </div>
+        <div id="response" class="bg-gray-50 rounded-lg p-6 min-h-[100px] shadow-inner">
+            <p class="text-gray-500 italic">Your response will appear here...</p>
+        </div>
+        <div id="image-response" class="mt-6 flex justify-center">
+            <img id="response-image" src="" alt="Response visualization" class="rounded-lg shadow-md hidden">
+        </div>
+        <div class="mt-6 text-center">
+            <p class="text-gray-500 text-sm">Made with ❤️ by <a href="https://www.nischalpandey.com.np" target="_blank" rel="noopener noreferrer" class="text-indigo-500 hover:underline">Nischal Pandey</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sampleQuestions = [
+                'What you can do for me?',
+                'What is NEPSE?',
+                'Price History of NEPSE Index',
+                'Predict the future moves of NEPSE',
+                'Analyze the NEPSE',
+                'How do I open a DEMAT account?',
+                'What are the top performing stocks this week?'
+            ];
+
+            const sampleList = document.getElementById('sample-list');
+            sampleQuestions.forEach(question => {
+                const listItem = document.createElement('li');
+                listItem.className = 'text-indigo-500 cursor-pointer hover:text-indigo-700 transition duration-300 flex items-center';
+                listItem.innerHTML = `
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>${question}</span>
+                `;
+                listItem.addEventListener('click', () => {
+                    document.getElementById('query').value = question;
+                    submitQuery();
+                });
+                sampleList.appendChild(listItem);
+            });
+
+            document.getElementById('query-form').addEventListener('submit', (event) => {
+                event.preventDefault();
+                submitQuery();
+            });
+        });
+        function convertNewlinesToBreaks(text) {
+        return text.replace(/\n/g, '<br>');
+    }
+        function submitQuery() {
+            const query = document.getElementById('query').value;
+            const responseDiv = document.getElementById('response');
+            const imageResponse = document.getElementById('response-image');
+
+            responseDiv.innerHTML = '<p class="text-indigo-500 italic">Loading response... This may take a few minutes for the first response.</p>';
+            imageResponse.classList.add('hidden');
+
+            fetch('/api/query/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseDiv.innerHTML =convertNewlinesToBreaks(data.response);
+                
+                if (data.image_url) {
+                    imageResponse.src = data.image_url;
+                    imageResponse.classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                responseDiv.innerHTML = '<p class="text-red-500">An error occurred while fetching the response. Please try again.</p>';
+            });
+        }
+    </script>
+</body>
+</html>
